@@ -1,0 +1,25 @@
+Zadanie 3.1
+
+Strona www z poprzednich zadań otrzymała nowe style, zgodnie z rysunkiem 3a.jpg.
+Stwórz style CSS by Twoja strona wyglądała podobnie. Tym razem ważne elementy to:
+
++ Rozwijane menu: po najechaniu pojawia się lista zakładek należących do danego elementu listy
++ Dwie kolumny na treść
++ Stopka w trzech kolumnach
++ Szerokość kolumn dostosowuje się do szerokości ekranu
++ Obrazek ma szerokość swojej kolumny z treścią
++ Tabelka ma poziome linie odgraniczające komórki od dołu
++ Ten sam kod HTML ma pasować zarówno do nowego stylu, jak i tego z poprzedniego zjazdu (do zmiany wyglądu powinna wystarczyć zmiana ścieżki do pliku CSS)!
+
+
+Zadanie 3.2
+
+Strona www posiada prostą responsywność (zgodnie z rysunkiem 3b.jpg):
++ Dla mniejszych rozdzielczości (np < 1000px) ma pozostać jedna kolumna tekstu
++ Ostatni podpunkt z zadania 3.1 dalej obowiązuje!
+
+
+Zadanie 3.3
+
+Gdyby tabelka na stronie posiadała więcej kolumn, mogłaby nie zmieścić się na małych ekranach. Zaproponuj rozwiązanie tego problemu (np. odpowiednio ostylowane divy zamiast tabelki: media queries, flex, grid)
+

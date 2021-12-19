@@ -1,0 +1,95 @@
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 12px;
+    margin: 0 auto;
+    width: 1000px;
+    background-image: url("jezioro.jpg");
+}
+
+main {
+    background-color:rgba(75, 191, 236, 0.57);
+}
+
+nav {
+    width: 200px; 
+    float: left;
+}
+
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+nav > ul > li {
+    background-color: cornflowerblue;
+    font-weight: bold;
+}
+nav > ul > li:hover {
+    background-color: rgba(100, 148, 237, 0.2);
+}
+li > ul > li:hover {
+    background-color: rgba(65, 105, 225, 0.2);
+}
+li > ul > li {
+    text-indent: 10%;
+    background-color: royalblue;
+    font-weight: normal;
+}
+
+li a {
+    display: block;
+    padding: 6px;
+    text-decoration: none;
+    color: white;
+    border: .1px dotted gray;
+}
+
+a:hover {
+    opacity: 0.2;
+}
+
+section {
+    display: block;
+    width: 780px; 
+    height: 500px; 
+    padding: 10px;
+    overflow-y: scroll;
+    background-color: skyblue;
+}
+
+h3 {
+    color : blue;
+    font-size: 3vw;
+}
+
+form { 
+    columns: 2;
+}
+
+table {
+    width: 100%;
+    text-align: center;
+}
+
+th { 
+    color: white;
+    background-color:steelblue ;
+    padding: 10px;
+}
+
+td {
+    padding: 10px;
+}
+
+tr:nth-child(even) {
+    background-color: lightgray;
+}
+
+footer {
+    display: block;
+    background-color: navy;
+    padding: 1px;
+    text-align: center;
+    color: white;
+}

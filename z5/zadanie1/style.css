@@ -1,0 +1,6 @@
+.editable {
+    width: 50px;
+    height: 50px;
+    background-color: lightcoral;
+    border: solid lightgreen 2px;
+}

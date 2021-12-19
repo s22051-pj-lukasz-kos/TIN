@@ -1,0 +1,4 @@
+ZADANIE JQUERY - KOLOROWANKA
+
+Korzystając z kodu zawartego w paczce, dokończyć aplikację - prosty program graficzny.
+Aplikacja powinna umożliwiać modyfikacje obszaru roboczego (po prawej stronie ekranu) zgodnie z wybranym kolorem i narzędziem (po lewej stronie ekranu). Na przykład, gdy włączona jest opcja "kolorowanie diva", kliknięcie w dowolny div po prawej stronie powinno ten div pokolorować (ale tylko ten kliknięty). Podobnie należy obsłużyć inne opcje zawarte na liście rozwijanej.
