@@ -77,7 +77,20 @@ $(() => {
 
     // przenoszenie diva
     function moveDiv() {
-      alert("ta funkcja nie istnieje, bo nie wiem co znaczy 'Przenoszenie diva'");
+      let divToMove;
+      $("#right div").click((e) => {
+        /* 
+          bez zatrzymania propagacji w górę drzewka DOM, 
+          detach() działa w sposób nieprzewidywany
+        */
+        e.stopPropagation();
+        if (divToMove) {
+          $(e.target).append(divToMove);
+          divToMove = null;
+        } else {
+          divToMove = $(e.target).detach();
+        }
+      });
     }
 
     // kolorowanie ramki
@@ -97,7 +110,7 @@ $(() => {
         e.stopPropagation();
         $(e.target).append(() => {
           let newDiv = document.createElement("div");
-          newDiv.style.borderRadius = "30%";
+          $(newDiv).css("borderRadius", "30%");
           return newDiv;
         });
       });
