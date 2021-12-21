@@ -14,7 +14,14 @@ $(() => {
 
     // nasłuch na przycisk
     $("#wlacz").click(() => {
+      /* 
+        W pierwszej kolejności należy wyłączyć nasłuch na eventy, 
+        inaczej funkcje będą powielane. Robimy to z każdym selektorem z osobna, 
+        któremu włączyliśmy nasłuch.  
+      */
+      $("#right").off();
       $("#right div").off();
+      // pobieranie danych z input#color oraz select#opcja
       color = $("#color").val();
       selectOption = $("select option:selected").val();
       menu(color, selectOption);
@@ -50,20 +57,13 @@ $(() => {
     // kolorowanie diva
     function painting(color) {
       $("#right div").click((e) => {
-        // bez zatrzymania propagacji w górę drzewka DOM, e.target koloruje divy przodków
-        e.stopPropagation();  
         $(e.target).css("backgroundColor", color);
       });
     }
 
     // dodawanie diva
     function addDiv() {
-      $("#right div").click((e) => {
-        /* 
-        bez zatrzymania propagacji w górę drzewka DOM, 
-        e.target dodaje n divów w zależności od głębokości n względem div#right
-        */
-        e.stopPropagation();
+      $("#right").click((e) => {
         $(e.target).append(document.createElement("div"));
       });
     }
@@ -77,37 +77,30 @@ $(() => {
 
     // przenoszenie diva
     function moveDiv() {
-      let divToMove;
-      $("#right div").click((e) => {
-        /* 
-          bez zatrzymania propagacji w górę drzewka DOM, 
-          detach() działa w sposób nieprzewidywany
-        */
-        e.stopPropagation();
+      let divToMove = null;
+      $("#right").click((e) => {
         if (divToMove) {
           $(e.target).append(divToMove);
           divToMove = null;
         } else {
-          divToMove = $(e.target).detach();
+          // warunek uniemożliwia 'wycięcie' #right
+          if(e.target.id != "right"){
+            divToMove = $(e.target).detach();
+          }
         }
       });
     }
 
     // kolorowanie ramki
     function borderColor(color) {
-      $("#right div").click((e) => {
+      $("#right").click((e) => {
          $(e.target).css("borderColor", color);
       });
     }
 
     // dodawanie zaokrąglonego diva
     function borderRadius() {
-      $("#right div").click((e) => {
-        /* 
-        bez zatrzymania propagacji w górę drzewka DOM, 
-        e.target dodaje n divów w zależności od głębokości n względem div#right
-        */
-        e.stopPropagation();
+      $("#right").click((e) => {
         $(e.target).append(() => {
           let newDiv = document.createElement("div");
           $(newDiv).css("borderRadius", "30%");
