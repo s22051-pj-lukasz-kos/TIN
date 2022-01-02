@@ -1,4 +1,4 @@
-//funkcja na zaladowanie dokumentu
+// funkcja na zaladowanie dokumentu
 $(() => {
     console.log("jquery works");
     

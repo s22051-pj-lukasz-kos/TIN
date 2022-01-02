@@ -1,0 +1,11 @@
+Zjazd 7 - zadanie
+Praca w grupach 2-3 osobowych.
+Inspiracja: http://www.2meter3.de/jqPuzzle/
+
+Zadanie: przy pomocy JQuery, ale bez innych gotowych bibliotek dokończyć aplikację - układankę. Ma posiadać następujące funkcje:
+1. Przesuwanie kafelka w wolne miejsce układanki (nie musi być animowane, może być na kliknięcie) (1.2p). 
+2. Kontrola, czy kafelek przesuwany sąsiaduje z pustym miejscem, inaczej nie można przesunąć. (0.2p)
+3. Po prawidłowym ułożeniu aplikacja powinna wyświetlić komunikat z gratulacjami. (0.2p)
+4. Na początek kafelki powinny być losowo pomieszane. (0.2p)
+5. Obsługa układanek o wymiarach innych niż 3x3 (np. wpisywanie w inpucie, jak ma być podzielona układanka) (0.2p)
+        
