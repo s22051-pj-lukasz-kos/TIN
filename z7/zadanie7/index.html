@@ -1,41 +1,71 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>Układanka JQuery</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <script src="jquery.min.js"></script>
-        
-        <style type="text/css">
-            
-            .container{width:500px;height:356px;float:left;}
-            .obrazek{width:164px;height:116px;border:1px solid black;float:left;background:url(http://www.2meter3.de/jqPuzzle/street.jpg) no-repeat}
-            .obrazek1{background-position: left top;}
-            .obrazek2{background-position: center top;}
-            .obrazek3{background-position: right top;}
-            .obrazek4{background-position: left center;}
-            .obrazek5{background-position: center;}
-            .obrazek6{background-position: right center;}
-            .obrazek7{background-position: left bottom;}
-            .obrazek8{background-position: center bottom;}
-            .obrazek9{background-position: right bottom;}
-            .pusty{width:164px;height:116px;border:1px solid white;float:left;}
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            
-            <div id="div1" class="obrazek obrazek1"></div>
-            <div id="div2" class="obrazek obrazek2"></div>
-            <div id="div3" class="obrazek obrazek3"></div>
-            <div id="div4" class="obrazek obrazek4"></div>
-            <div id="div5" class="obrazek obrazek5"></div>
-            <div id="div6" class="obrazek obrazek6 sasiaduje"></div>
-            <div id="div7" class="obrazek obrazek7"></div>
-            <div id="div8" class="obrazek obrazek8 sasiaduje"></div>
-            <div id="div9" class="pusty"></div>
-            
-        </div>
-        <script src="main.js"></script>
-    </body>
+  <head>
+    <title>Układanka JQuery</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="jquery.min.js"></script>
+
+    <style type="text/css">
+      .container {
+        width: 500px;
+        height: 356px;
+        float: left;
+      }
+      .obrazek {
+        width: 164px;
+        height: 116px;
+        border: 1px solid black;
+        float: left;
+        background: url(http://www.2meter3.de/jqPuzzle/street.jpg) no-repeat;
+      }
+      .obrazek1 {
+        background-position: left top;
+      }
+      .obrazek2 {
+        background-position: center top;
+      }
+      .obrazek3 {
+        background-position: right top;
+      }
+      .obrazek4 {
+        background-position: left center;
+      }
+      .obrazek5 {
+        background-position: center;
+      }
+      .obrazek6 {
+        background-position: right center;
+      }
+      .obrazek7 {
+        background-position: left bottom;
+      }
+      .obrazek8 {
+        background-position: center bottom;
+      }
+      .obrazek9 {
+        background-position: right bottom;
+      }
+      .pusty {
+        width: 164px;
+        height: 116px;
+        border: 1px solid white;
+        float: left;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div id="div1" class="obrazek obrazek1"></div>
+      <div id="div2" class="obrazek obrazek2"></div>
+      <div id="div3" class="obrazek obrazek3"></div>
+      <div id="div4" class="obrazek obrazek4"></div>
+      <div id="div5" class="obrazek obrazek5"></div>
+      <div id="div6" class="obrazek obrazek6 sasiaduje"></div>
+      <div id="div7" class="obrazek obrazek7"></div>
+      <div id="div8" class="obrazek obrazek8 sasiaduje"></div>
+      <div id="div9" class="pusty"></div>
+    </div>
+    <script src="main.js"></script>
+  </body>
 </html>
