@@ -26,6 +26,14 @@ $(() => {
     }
   }
 
+  // klasa obsługująca funkcje liniowe
+  class LinearFunction {
+    constructor(a, b) {
+      this.a = a;
+      this.b = b;
+    }
+  }
+
   // zmienna zawierająca współrzędne trzpienia
   const spindle = new Coordinates(400, 800);
   let armPivot = new Coordinates(400, undefined);
@@ -289,9 +297,54 @@ $(() => {
     return linear.toFixed(2);
   }
 
-  // TODO: funkcja do liczenia pozycji zewnętrznego punktu zerowego
+  // funkcja do liczenia pozycji zewnętrznego punktu zerowego
+  function calcOuterNullPointCoord(result) {
+    // obliczyć y
+    let numerator =
+      -Math.pow(result.mountingDistanceParams.armPivot.y, 2) +
+      Math.pow(result.effectiveLength, 2) +
+      Math.pow(result.mountingDistanceParams.spindle.y, 2) -
+      Math.pow(result.innerNullPointCoord.alignment.np2, 2);
+
+    let denominator =
+      2 * result.mountingDistanceParams.spindle.y +
+      2 * -result.mountingDistanceParams.armPivot.y;
+
+    let outerNullPointY = numerator / denominator;
+
+    // obliczyć x z rozwiązania funkcji kwadratowej
+    let b = 2 * -result.mountingDistanceParams.spindle.x;
+    let c =
+      Math.pow(result.mountingDistanceParams.spindle.x, 2) +
+      Math.pow(outerNullPointY - result.mountingDistanceParams.spindle.y, 2) -
+      Math.pow(result.innerNullPointCoord.alignment.np2, 2);
+    let delta = Math.sqrt(Math.pow(b, 2) - 4 * c);
+
+    let outerNullPointX = (-b + delta) / 2;
+
+    let outerNullPointCoord = new Coordinates(outerNullPointX, outerNullPointY);
+    return outerNullPointCoord;
+  }
+
+  // funkcja znajdująca równanie funkcji liniowej na bazie współrzędnych dwóch punktów
+  function linearFunction(x1, y1, x2, y2) {
+    let a = (y2 - y1) / (x2 - x1);
+    let b = y1 - a * x1;
+    let linearFunction = new LinearFunction(a, b);
+    return linearFunction;
+  }
+
+  // funkcja znajdująca równanie funkcji liniowej prostopadłej do podanej funkcji i punktu przecięcia
+  function findPerpendicular(linearFunction, x, y) {
+    let a = -1 / linearFunction.a;
+    let b = y - a * x;
+    let perpendicularFunction = new LinearFunction(a, b);
+    return perpendicularFunction;
+  }
+
   // funkcja do rysowania kątomierza
   function drawProtractor(canvas, result) {
+    let x, y, x1, x2, y1, y2;
     // czyszczenie płótna
     canvas.clearRect(0, 0, 2000, 1250);
 
@@ -300,7 +353,7 @@ $(() => {
     canvas.arc(
       result.mountingDistanceParams.spindle.x,
       result.mountingDistanceParams.spindle.y,
-      35,
+      36,
       0,
       2 * Math.PI
     );
@@ -379,17 +432,11 @@ $(() => {
     canvas.closePath();
     canvas.stroke();
 
-    // TODO:
-    // punkt osadzenia igły dla wewnętrznego punktu zerowego
+    // punkt osadzenia igły dla zewnętrznego punktu zerowego
+    let outerNullPointCoord = calcOuterNullPointCoord(result);
     canvas.fillStyle = "#ff0000";
     canvas.beginPath();
-    canvas.arc(
-      result.innerNullPointCoord.x + result.mountingDistanceParams.spindle.x,
-      result.innerNullPointCoord.y + result.mountingDistanceParams.spindle.y,
-      5,
-      0,
-      2 * Math.PI
-    );
+    canvas.arc(outerNullPointCoord.x, outerNullPointCoord.y, 5, 0, 2 * Math.PI);
     canvas.fill();
     canvas.closePath();
     canvas.stroke();
@@ -418,79 +465,58 @@ $(() => {
     canvas.closePath();
     canvas.stroke();
 
-    // // linia łącząca wewnętrzny punkt zerowy z osią obrotu ramienia
-    // canvas.beginPath();
-    // canvas.moveTo(400, -4200);
-    // canvas.lineTo(1059, 836);
-    // canvas.stroke();
-
-    // // linia łącząca zewnętrzny punkt zerowy z osią obrotu ramienia
-    // canvas.beginPath();
-    // canvas.moveTo(400, -4200);
-    // canvas.lineTo(1607, 733);
-    // canvas.stroke();
-  }
-
-  function drawCanvas(canvas) {
-    // oś talerza, trzpień
+    // linia wyznaczająca podstawę pod wewnętrzny punkt zerowy
+    x1 = result.mountingDistanceParams.spindle.x;
+    y1 = result.mountingDistanceParams.spindle.y;
+    x2 = x1 + result.innerNullPointCoord.x;
+    y2 = y1 + result.innerNullPointCoord.y;
+    let innerBaseLinearFunction = linearFunction(x1, y1, x2, y2);
     canvas.beginPath();
-    canvas.arc(400, 800, 35, 0, 2 * Math.PI);
-    canvas.closePath();
+    x = x2 - 100;
+    y = innerBaseLinearFunction.a * x + innerBaseLinearFunction.b;
+    canvas.moveTo(x, y);
+    y = innerBaseLinearFunction.a * (x + 200) + innerBaseLinearFunction.b;
+    canvas.lineTo(x + 200, y);
     canvas.stroke();
 
-    // krzyżyk na trzpieniu
-    canvas.strokeStyle = "#ff0000";
+    // linia wzdłuż wkładki gramofonowej dla wewnętrzego punktu zerowego
+    let perpendicularFunction = findPerpendicular(
+      innerBaseLinearFunction,
+      x2,
+      y2
+    );
     canvas.beginPath();
-    canvas.moveTo(380, 800);
-    canvas.lineTo(420, 800);
-    canvas.moveTo(400, 780);
-    canvas.lineTo(400, 820);
-    canvas.stroke();
-    canvas.strokeStyle = "#000000";
+    y = y2 + 200;
+    x = (y - perpendicularFunction.b) / perpendicularFunction.a;
+    canvas.moveTo(x, y);
+    x = (y - 600 - perpendicularFunction.b) / perpendicularFunction.a;
 
-    // ostatnia wewnętrzna ścieżka płyty
-    canvas.beginPath();
-    canvas.arc(400, 800, 603, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // wewnętrzny punkt zerowy
-    canvas.beginPath();
-    canvas.arc(400, 800, 660, 0, 2 * Math.PI);
-    canvas.closePath();
+    canvas.lineTo(x, y - 600);
     canvas.stroke();
 
-    // zewnętrzny punkt zerowy
+    // linia wyznaczająca podstawę pod zewnętrzny punkt zerowy
+    x1 = result.mountingDistanceParams.spindle.x;
+    y1 = result.mountingDistanceParams.spindle.y;
+    x2 = outerNullPointCoord.x;
+    y2 = outerNullPointCoord.y;
+    let outerBaseLinearFunction = linearFunction(x1, y1, x2, y2);
     canvas.beginPath();
-    canvas.arc(400, 800, 1209, 0, 2 * Math.PI);
-    canvas.closePath();
+    x = x2 - 100;
+    y = outerBaseLinearFunction.a * x + outerBaseLinearFunction.b;
+    canvas.moveTo(x, y);
+    y = outerBaseLinearFunction.a * (x + 200) + outerBaseLinearFunction.b;
+    canvas.lineTo(x + 200, y);
     canvas.stroke();
 
-    // zewnętrzna ścieżka odtwarzania na płycie
+    // // linia wzdłuż wkładki gramofonowej dla zewnętrznego punktu zerowego
+    perpendicularFunction = findPerpendicular(outerBaseLinearFunction, x2, y2);
     canvas.beginPath();
-    canvas.arc(400, 800, 1406, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
+    y = y2 + 200;
+    x = (y - perpendicularFunction.b) / perpendicularFunction.a;
+    canvas.moveTo(x, y);
+    x = (y - 600 - perpendicularFunction.b) / perpendicularFunction.a;
 
-    // odległość skuteczna; łuk, jaki zatacza ramię gramofonu
-    canvas.beginPath();
-    canvas.arc(400, -4200, 5079, 0, 2 * Math.PI);
-    canvas.closePath();
+    canvas.lineTo(x, y - 600);
     canvas.stroke();
-
-    // linia łącząca wewnętrzny punkt zerowy z osią obrotu ramienia
-    canvas.beginPath();
-    canvas.moveTo(400, -4200);
-    canvas.lineTo(1059, 836);
-    canvas.stroke();
-
-    // linia łącząca zewnętrzny punkt zerowy z osią obrotu ramienia
-    canvas.beginPath();
-    canvas.moveTo(400, -4200);
-    canvas.lineTo(1607, 733);
-    canvas.stroke();
-
-    // TODO:
-    // prosta linia jako wzornik pod skalowanie
   }
 });
