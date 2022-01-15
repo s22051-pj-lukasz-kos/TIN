@@ -3,7 +3,6 @@ $(() => {
 
   // płótno
   let can = document.getElementById("katomierz").getContext("2d");
-  let can2 = document.getElementById("katomierz2").getContext("2d");
 
   // poszczególne ustawienia
   const baerwald = {
@@ -75,7 +74,7 @@ $(() => {
     calcEffectiveLength() {
       let effectiveLength = 0;
       effectiveLength = Math.hypot(
-        this.nullPointsCoord.x - this.mountingDistanceParams.armPivot.x,
+        this.nullPointsCoord.x,
         this.nullPointsCoord.y + this.mountingDistanceParams.mountingDistance
       );
       return effectiveLength;
@@ -135,61 +134,53 @@ $(() => {
     validateForm();
   });
 
-  /* TODO:
-    * napisać funkcję, która liczy dane dla poszczególnych pozycji wewnętrznego punktu zerowego i umieszcza je w tablicy
-    * napisać funkcję, która iteruje tablicę i wyszukuje najmniejszą różnicę LOC między punktami i zwraca pożądane dane
-    * przekierować dane do tablicy i do funkcji rysującej kątomierz
-    * napisać rysowanie kątomierza wykorzystującego dane z argumentów
-    
-    * wykres pokazujący przestery (W OSTATECZNOŚCI)
-  */
-
-  //poniżej jest test płótna
-  // płótno z kątomierzem
-  drawCanvas(can);
-  drawCanvas2(can2);
-
   // funkcja, która odpala się po wypełnieniu formularza i wciśnięciu przycisku
   function validateForm() {
     // pobiera odległość montażową z formularza
-    let mountingDistance = document.forms["form"]["inputMountDist"].value;
-    let mountingDistanceParams = new MountingDistanceParams(
-      mountingDistance,
-      spindle,
-      armPivot
-    );
-
-    // pobiera typ kątomierza z formularza i na jego podstawie pobiera odpowiednie ustawienie
-    let alignment;
-    if ($("#radioBaer").prop("checked")) {
-      alignment = baerwald;
-    } else if ($("#radioLoef").prop("checked")) {
-      alignment = loefgren;
-    } else if ($("#radioSteven").prop("checked")) {
-      alignment = stevenson;
-    }
-
-    // dokonuje obliczeń, by znaleźć najlepsze możliwe parametry dla poszczególnych ustawień
-
-    let baerResult = calculations(mountingDistanceParams, baerwald);
-    calcComponents = [];
-    let loefResult = calculations(mountingDistanceParams, loefgren);
-    calcComponents = [];
-    let stevResult = calculations(mountingDistanceParams, stevenson);
-    calcComponents = [];
-
-    // następnie wywoływana jest funkcja, która umieszcza dane w tabeli
+    let mountingDistance = document.getElementById("inputMountDist").value;
+    let text;
     if (
-      parseFloat(mountingDistance) >= 150.0 &&
-      parseFloat(mountingDistance) <= 500.0
+      isNaN(mountingDistance) ||
+      mountingDistance < 150 ||
+      mountingDistance > 500
     ) {
+      text = "Odległość montażowa powinna wynosić od 150 do 500mm";
+    } else {
+      text = "";
+
+      let mountingDistanceParams = new MountingDistanceParams(
+        mountingDistance,
+        spindle,
+        armPivot
+      );
+
+      // dokonuje obliczeń, by znaleźć najlepsze możliwe parametry dla poszczególnych ustawień
+      let baerResult = calculations(mountingDistanceParams, baerwald);
+      calcComponents = [];
+      let loefResult = calculations(mountingDistanceParams, loefgren);
+      calcComponents = [];
+      let stevResult = calculations(mountingDistanceParams, stevenson);
+      calcComponents = [];
+
+      // następnie wywoływana jest funkcja, która umieszcza dane w tabeli
       fillTable(mountingDistanceParams, baerResult, loefResult, stevResult);
+
+      // pobiera typ kątomierza z formularza i na jego podstawie pobiera odpowiednie ustawienie
+      // i wyliczone parametry
+      let result;
+      if ($("#radioBaer").prop("checked")) {
+        result = baerResult;
+      } else if ($("#radioLoef").prop("checked")) {
+        result = loefResult;
+      } else if ($("#radioSteven").prop("checked")) {
+        result = stevResult;
+      }
+
+      // i na bazie tych ustawień rysuje kątomierz do gramofonu
+      drawProtractor(can, result);
     }
-    /*
-      TODO:
-      * następnie wywoływana jest funkcja, która wypełnia tabelę danymi
-      * następnie wywoływana jest funkcja, która rysuje płótno w zależności od ustawień
-    */
+    // umieszcza tekst pod inputem w razie, gdyby dane wejściowe nie mieściły się w zakresie
+    $("#inputMessageField").text(text);
   }
 
   // funkcja licząca wszystkie parametry dla serii wewnętrznych punktów zerowych o różnych współrzędnych
@@ -215,7 +206,7 @@ $(() => {
       }
     } while (y >= 0);
 
-    // przeszukuje tablicę i zwraca szukany element
+    // sortuje tablicę i zwraca porządany wynik
     calcComponents.sort((a, b) => {
       return a.locDifference - b.locDifference;
     });
@@ -297,6 +288,149 @@ $(() => {
     return linear.toFixed(2);
   }
 
+  // TODO: funkcja do liczenia pozycji zewnętrznego punktu zerowego
+
+  // funkcja do rysowania kątomierza
+  function drawProtractor(canvas, result) {
+    // czyszczenie płótna
+    canvas.clearRect(0, 0, 2000, 1250);
+
+    // oś talerza, trzpień
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y,
+      35,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // krzyżyk na trzpieniu
+    canvas.strokeStyle = "#ff0000";
+    canvas.beginPath();
+    canvas.moveTo(
+      result.mountingDistanceParams.spindle.x - 20,
+      result.mountingDistanceParams.spindle.y
+    );
+    canvas.lineTo(
+      result.mountingDistanceParams.spindle.x + 20,
+      result.mountingDistanceParams.spindle.y
+    );
+    canvas.moveTo(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y - 20
+    );
+    canvas.lineTo(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y + 20
+    );
+    canvas.stroke();
+    canvas.strokeStyle = "#000000";
+
+    // ostatnia wewnętrzna ścieżka płyty
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y,
+      603,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // wewnętrzny punkt zerowy
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y,
+      result.nullPointsCoord.alignment.np1,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // punkt osadzenia igły dla wewnętrznego punktu zerowego
+    canvas.fillStyle = "#ff0000";
+    canvas.beginPath();
+    canvas.arc(
+      result.nullPointsCoord.x + result.mountingDistanceParams.spindle.x,
+      result.nullPointsCoord.y + result.mountingDistanceParams.spindle.y,
+      5,
+      0,
+      2 * Math.PI
+    );
+    canvas.fill();
+    canvas.closePath();
+    canvas.stroke();
+
+    // zewnętrzny punkt zerowy
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y,
+      result.nullPointsCoord.alignment.np2,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // TODO:
+    // punkt osadzenia igły dla wewnętrznego punktu zerowego
+    canvas.fillStyle = "#ff0000";
+    canvas.beginPath();
+    canvas.arc(
+      result.nullPointsCoord.x + result.mountingDistanceParams.spindle.x,
+      result.nullPointsCoord.y + result.mountingDistanceParams.spindle.y,
+      5,
+      0,
+      2 * Math.PI
+    );
+    canvas.fill();
+    canvas.closePath();
+    canvas.stroke();
+
+    // zewnętrzna ścieżka odtwarzania na płycie
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.spindle.x,
+      result.mountingDistanceParams.spindle.y,
+      1406,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // odległość skuteczna; łuk, jaki zatacza ramię gramofonu
+    canvas.beginPath();
+    canvas.arc(
+      result.mountingDistanceParams.armPivot.x,
+      result.mountingDistanceParams.armPivot.y,
+      result.effectiveLength,
+      0,
+      2 * Math.PI
+    );
+    canvas.closePath();
+    canvas.stroke();
+
+    // // linia łącząca wewnętrzny punkt zerowy z osią obrotu ramienia
+    // canvas.beginPath();
+    // canvas.moveTo(400, -4200);
+    // canvas.lineTo(1059, 836);
+    // canvas.stroke();
+
+    // // linia łącząca zewnętrzny punkt zerowy z osią obrotu ramienia
+    // canvas.beginPath();
+    // canvas.moveTo(400, -4200);
+    // canvas.lineTo(1607, 733);
+    // canvas.stroke();
+  }
+
   function drawCanvas(canvas) {
     // oś talerza, trzpień
     canvas.beginPath();
@@ -354,69 +488,6 @@ $(() => {
     canvas.beginPath();
     canvas.moveTo(400, -4200);
     canvas.lineTo(1607, 733);
-    canvas.stroke();
-
-    // TODO:
-    // prosta linia jako wzornik pod skalowanie
-  }
-
-  function drawCanvas2(canvas) {
-    // oś talerza, trzpień
-    canvas.beginPath();
-    canvas.arc(400, 800, 35, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // krzyżyk na trzpieniu
-    canvas.strokeStyle = "#ff0000";
-    canvas.beginPath();
-    canvas.moveTo(380, 800);
-    canvas.lineTo(420, 800);
-    canvas.moveTo(400, 780);
-    canvas.lineTo(400, 820);
-    canvas.stroke();
-    canvas.strokeStyle = "#000000";
-
-    // ostatnia wewnętrzna ścieżka płyty
-    canvas.beginPath();
-    canvas.arc(400, 800, 603, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // wewnętrzny punkt zerowy
-    canvas.beginPath();
-    canvas.arc(400, 800, 660, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // zewnętrzny punkt zerowy
-    canvas.beginPath();
-    canvas.arc(400, 800, 1209, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // zewnętrzna ścieżka odtwarzania na płycie
-    canvas.beginPath();
-    canvas.arc(400, 800, 1406, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // odległość skuteczna; łuk, jaki zatacza ramię gramofonu
-    canvas.beginPath();
-    canvas.arc(400, -700, 1746, 0, 2 * Math.PI);
-    canvas.closePath();
-    canvas.stroke();
-
-    // linia łącząca wewnętrzny punkt zerowy z osią obrotu ramienia
-    canvas.beginPath();
-    canvas.moveTo(400, -700);
-    canvas.lineTo(1049, 921);
-    canvas.stroke();
-
-    // linia łącząca zewnętrzny punkt zerowy z osią obrotu ramienia
-    canvas.beginPath();
-    canvas.moveTo(400, -700);
-    canvas.lineTo(1589, 579);
     canvas.stroke();
 
     // TODO:

@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="images/favicon.ico">
     <link rel="stylesheet" href="styles/main.css" />
     <script src="scripts/jquery-3.6.0.min.js"></script>
 
@@ -20,37 +21,25 @@
     -->
 
     <!-- formularz (generator) -->
-    <form name="form">
       <label for="inputMountDist"
         >Odległość montażowa (mounting distance) [mm]</label
       >
-      <input type="number" name="inputMountDist" id="inputMountDist"  step="0.1" min="150" max="500" value="200.5" autofocus required/>
-      <fieldset>
-        <legend>Typ kątomierza</legend>
-        <input type="radio" name="radioProtrac" id="radioBaer" checked/>
-        <label for="radioBaer">Baerwald</label>
-        <input type="radio" name="radioProtrac" id="radioLoef" />
-        <label for="radioLoef">Loefgren</label>
-        <input type="radio" name="radioProtrac" id="radioSteven" />
-        <label for="radioSteven">Stevenson</label>
-      </fieldset>
+      <input type="number" name="inputMountDist" id="inputMountDist"  step="0.1" min="150" max="500" value="200.5" autofocus />
+      <p id="inputMessageField"></p>
+      <legend>Typ kątomierza</legend>
+      <input type="radio" name="radioProtrac" id="radioBaer" checked/>
+      <label for="radioBaer">Baerwald</label>
+      <input type="radio" name="radioProtrac" id="radioLoef" />
+      <label for="radioLoef">Loefgren</label>
+      <input type="radio" name="radioProtrac" id="radioSteven" />
+      <label for="radioSteven">Stevenson</label>
+    
+      <!-- <input type="submit" value="Generuj dane i kątomierz"> -->
       <button id="formBtn" type="button">Generuj dane i kątomierz</button>
-    </form>
-
-    <button id="button1" type="button">Płótno</button>
 
     <!-- link do wyjaśnienia jak zrobić wymagane pomiary(measure.html) -->
 
     <!-- tabela wyliczająca ustawienia  -->
-    <!-- 
-      TODO:
-      * obmyślić wzór liczący długość skuteczną ramienia
-        * wzór na styczną okręgu
-        * ??? zrobić tabelę wyników kątów przegięcia dla wewnętrzego i zewnętrznego punktu zerowego
-          * punkt wewnętrzny zacząć liczyć od 30mm (300px) poniżej w osi y względem osi talerza
-      * napisać skrypt liczący pozostałe parametry dla Baerwalda względem podanej odległości montażowej
-    -->
-
     <table>
       <thead>
         <tr>
@@ -106,16 +95,6 @@
       </tbody>
     </table>
 
-    <!-- wykresy pokazujące przestery -->
-
-    <!-- płótno z kątomierzem
-    NOTE:
-    * nie zmieniać rozdzielczości
-    * 10px - 1mm
-    * oś pionowa rozpięta między osią talerza, a osią ramienia - 400 px
-    * skalowanie dokonuje się automatycznie z zachowaniem proporcji, nie zmieniać CSS!
-    -->
     <canvas id="katomierz" width="2000" height="1250"></canvas>
-    <canvas id="katomierz2" width="2000" height="1250"></canvas>
   </body>
 </html>
