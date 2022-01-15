@@ -31,7 +31,7 @@ $(() => {
   let armPivot = new Coordinates(400, undefined);
 
   // klasa do wyszukiwania współrzędnych punktów zerowych
-  class NullPointsCoord extends Coordinates {
+  class InnerNullPointCoord extends Coordinates {
     constructor(alignment, y) {
       let x = Math.sqrt(Math.pow(alignment.np1, 2) - Math.pow(y, 2));
       super(x, y);
@@ -61,9 +61,9 @@ $(() => {
 
   // klasa licząca parametry
   class CalcComponent {
-    constructor(mountingDistanceParams, nullPointsCoord) {
+    constructor(mountingDistanceParams, innerNullPointCoord) {
       this.mountingDistanceParams = mountingDistanceParams;
-      this.nullPointsCoord = nullPointsCoord;
+      this.innerNullPointCoord = innerNullPointCoord;
       this.effectiveLength = this.calcEffectiveLength();
       this.overhang = this.calcOverhang();
       this.innerLOC = this.calcInnerLOC();
@@ -74,8 +74,9 @@ $(() => {
     calcEffectiveLength() {
       let effectiveLength = 0;
       effectiveLength = Math.hypot(
-        this.nullPointsCoord.x,
-        this.nullPointsCoord.y + this.mountingDistanceParams.mountingDistance
+        this.innerNullPointCoord.x,
+        this.innerNullPointCoord.y +
+          this.mountingDistanceParams.mountingDistance
       );
       return effectiveLength;
     }
@@ -98,16 +99,16 @@ $(() => {
       let loc = 0;
       if (number === 1) {
         loc =
-          (Math.pow(this.nullPointsCoord.alignment.np1, 2) +
+          (Math.pow(this.innerNullPointCoord.alignment.np1, 2) +
             Math.pow(this.effectiveLength, 2) -
             Math.pow(this.mountingDistanceParams.mountingDistance, 2)) /
-          (2 * this.nullPointsCoord.alignment.np1 * this.effectiveLength);
+          (2 * this.innerNullPointCoord.alignment.np1 * this.effectiveLength);
       } else if (number === 2) {
         loc =
-          (Math.pow(this.nullPointsCoord.alignment.np2, 2) +
+          (Math.pow(this.innerNullPointCoord.alignment.np2, 2) +
             Math.pow(this.effectiveLength, 2) -
             Math.pow(this.mountingDistanceParams.mountingDistance, 2)) /
-          (2 * this.nullPointsCoord.alignment.np2 * this.effectiveLength);
+          (2 * this.innerNullPointCoord.alignment.np2 * this.effectiveLength);
       }
       return loc;
     }
@@ -190,10 +191,10 @@ $(() => {
 
     // dokonuje serii obliczeń dla wewnętrznego punktu zerowego
     do {
-      let nullPointsCoord = new NullPointsCoord(alignment, y);
+      let innerNullPointCoord = new InnerNullPointCoord(alignment, y);
       let calcComponent = new CalcComponent(
         mountingDistanceParams,
-        nullPointsCoord
+        innerNullPointCoord
       );
 
       // jeśli różnica między wewnętrznym, a zewnętrznym kątem przegięcia jest większa niż jeden stopień to przyśpiesz liczenie
@@ -254,24 +255,24 @@ $(() => {
 
     // wewnętrzny punkt zerowy
     $("#baerInnerNullPoint").text(
-      baerResult.nullPointsCoord.alignment.np1 / 10
+      baerResult.innerNullPointCoord.alignment.np1 / 10
     );
     $("#loefInnerNullPoint").text(
-      loefResult.nullPointsCoord.alignment.np1 / 10
+      loefResult.innerNullPointCoord.alignment.np1 / 10
     );
     $("#stevInnerNullPoint").text(
-      stevResult.nullPointsCoord.alignment.np1 / 10
+      stevResult.innerNullPointCoord.alignment.np1 / 10
     );
 
     // zewnętrzny punkt zerowy
     $("#baerOuterNullPoint").text(
-      baerResult.nullPointsCoord.alignment.np2 / 10
+      baerResult.innerNullPointCoord.alignment.np2 / 10
     );
     $("#loefOuterNullPoint").text(
-      loefResult.nullPointsCoord.alignment.np2 / 10
+      loefResult.innerNullPointCoord.alignment.np2 / 10
     );
     $("#stevOuterNullPoint").text(
-      stevResult.nullPointsCoord.alignment.np2 / 10
+      stevResult.innerNullPointCoord.alignment.np2 / 10
     );
   }
 
@@ -289,7 +290,6 @@ $(() => {
   }
 
   // TODO: funkcja do liczenia pozycji zewnętrznego punktu zerowego
-
   // funkcja do rysowania kątomierza
   function drawProtractor(canvas, result) {
     // czyszczenie płótna
@@ -346,7 +346,7 @@ $(() => {
     canvas.arc(
       result.mountingDistanceParams.spindle.x,
       result.mountingDistanceParams.spindle.y,
-      result.nullPointsCoord.alignment.np1,
+      result.innerNullPointCoord.alignment.np1,
       0,
       2 * Math.PI
     );
@@ -357,8 +357,8 @@ $(() => {
     canvas.fillStyle = "#ff0000";
     canvas.beginPath();
     canvas.arc(
-      result.nullPointsCoord.x + result.mountingDistanceParams.spindle.x,
-      result.nullPointsCoord.y + result.mountingDistanceParams.spindle.y,
+      result.innerNullPointCoord.x + result.mountingDistanceParams.spindle.x,
+      result.innerNullPointCoord.y + result.mountingDistanceParams.spindle.y,
       5,
       0,
       2 * Math.PI
@@ -372,7 +372,7 @@ $(() => {
     canvas.arc(
       result.mountingDistanceParams.spindle.x,
       result.mountingDistanceParams.spindle.y,
-      result.nullPointsCoord.alignment.np2,
+      result.innerNullPointCoord.alignment.np2,
       0,
       2 * Math.PI
     );
@@ -384,8 +384,8 @@ $(() => {
     canvas.fillStyle = "#ff0000";
     canvas.beginPath();
     canvas.arc(
-      result.nullPointsCoord.x + result.mountingDistanceParams.spindle.x,
-      result.nullPointsCoord.y + result.mountingDistanceParams.spindle.y,
+      result.innerNullPointCoord.x + result.mountingDistanceParams.spindle.x,
+      result.innerNullPointCoord.y + result.mountingDistanceParams.spindle.y,
       5,
       0,
       2 * Math.PI
